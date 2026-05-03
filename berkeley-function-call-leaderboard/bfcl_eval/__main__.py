@@ -163,6 +163,11 @@ def generate(
         "--lora-modules",
         help='Specify the path to the LoRA modules for vLLM backend in name="path" format. Can be specified multiple times.',
     ),
+    max_model_len: Optional[int] = typer.Option(
+        None,
+        "--max-model-len",
+        help="Override the maximum model context length passed to vLLM/SGLang. If not set, uses the value from the model config.",
+    ),
 ):
     """
     Generate the LLM response for one or more models on a test-category (same as openfunctions_evaluation.py).
@@ -186,6 +191,7 @@ def generate(
         enable_lora=enable_lora,
         max_lora_rank=max_lora_rank,
         lora_modules=lora_modules,
+        max_model_len=max_model_len,
     )
     load_dotenv(dotenv_path=DOTENV_PATH, verbose=True, override=True)  # Load the .env file
     generation_main(args)

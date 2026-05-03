@@ -82,6 +82,7 @@ class OSSHandler(BaseHandler, EnforceOverrides):
         lora_modules: Optional[list[str]] = None,
         enable_lora: bool = False,
         max_lora_rank: Optional[int] = None,
+        max_model_len: Optional[int] = None,
     ):
         """
         Spin up a local server for the model.
@@ -140,7 +141,9 @@ class OSSHandler(BaseHandler, EnforceOverrides):
             self.tokenizer = AutoTokenizer.from_pretrained(**load_kwargs)
             config = AutoConfig.from_pretrained(**load_kwargs)
 
-        if hasattr(config, "max_position_embeddings"):
+        if max_model_len is not None:
+            self.max_context_length = max_model_len
+        elif hasattr(config, "max_position_embeddings"):
             self.max_context_length = config.max_position_embeddings
         elif self.tokenizer.model_max_length is not None:
             self.max_context_length = self.tokenizer.model_max_length
@@ -174,6 +177,8 @@ class OSSHandler(BaseHandler, EnforceOverrides):
                             "--gpu-memory-utilization",
                             str(gpu_memory_utilization),
                             "--trust-remote-code",
+                            "--max-model-len",
+                            str(self.max_context_length),
                         ]
                         + (["--enable-lora"] if enable_lora else [])
                         + (
