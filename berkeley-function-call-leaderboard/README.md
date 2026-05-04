@@ -51,7 +51,31 @@ We introduce the Berkeley Function Calling Leaderboard (BFCL), the **first compr
 
 ## Installation & Setup
 
-### Basic Installation
+### Quick Start with uv (Recommended)
+
+[uv](https://docs.astral.sh/uv/) manages Python versions and dependencies automatically—no conda or virtualenv setup needed:
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone the repository
+git clone https://github.com/ShishirPatil/gorilla.git
+cd gorilla/berkeley-function-call-leaderboard
+
+# Run directly — uv creates the venv and installs deps on first invocation
+uv run bfcl --help
+```
+
+For self-hosted models, include the optional backend extra:
+
+```bash
+uv run --extra oss_eval_vllm bfcl generate --model MODEL_NAME --backend vllm ...
+# or
+uv run --extra oss_eval_sglang bfcl generate --model MODEL_NAME --backend sglang ...
+```
+
+### Basic Installation (pip / conda)
 
 ```bash
 # Create a new Conda environment with Python 3.10
@@ -88,11 +112,15 @@ If you are using an older GPU (T4/V100), you should use `vllm` instead as it sup
 **Using `vllm`:**
 ```bash
 pip install -e .[oss_eval_vllm]
+# or with uv:
+uv sync --extra oss_eval_vllm
 ```
 
 **Using `sglang`:**
 ```bash
 pip install -e .[oss_eval_sglang]
+# or with uv:
+uv sync --extra oss_eval_sglang
 ```
 
 *Optional:* If using `sglang`, we recommend installing `flashinfer` for speedups. Find instructions [here](https://docs.flashinfer.ai/installation.html).

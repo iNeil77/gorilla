@@ -109,6 +109,11 @@ For model names containing `{...}`, multiple versions are available. For example
 | Nanbeige3.5-Pro-Thinking               | Function Calling | Nanbeige       | Nanbeige3.5-Pro-Thinking-FC                                 |
 | Nanbeige4-3B-Thinking-2511             | Function Calling | Self-hosted 💻 | Nanbeige/Nanbeige4-3B-Thinking-2511                         |
 | Nemotron-4-340b-instruct               | Prompt           | NVIDIA         | nvidia/nemotron-4-340b-instruct                             |
+| OctoLong-Qwen3-{1.7B,4B,8B}-Stage3    | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-128K-Instruct-Stage3-FC |
+| OctoLong-Qwen3-{1.7B,4B,8B}-Stage3    | Prompt           | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-128K-Instruct-Stage3    |
+| OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M1 | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M1-FC      |
+| OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M2 | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M2-FC      |
+| OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-LC | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-LC-FC      |
 | o3-2025-04-16                          | Function Calling | OpenAI         | o3-2025-04-16-FC                                            |
 | o3-2025-04-16                          | Prompt           | OpenAI         | o3-2025-04-16                                               |
 | o4-mini-2025-04-16                     | Function Calling | OpenAI         | o4-mini-2025-04-16-FC                                       |

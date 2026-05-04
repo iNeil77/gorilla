@@ -36,8 +36,9 @@ berkeley-function-call-leaderboard/test_case_ids_to_generate.json
 # Ignore multi turn ground truth conversation log
 berkeley-function-call-leaderboard/bfcl_eval/scripts/ground_truth_conversation/
 
-# Ignore lock files
+# Ignore lock files (but track uv.lock for reproducible builds)
 berkeley-function-call-leaderboard/**/*.lock
+!berkeley-function-call-leaderboard/uv.lock
 
 .direnv/
 .venv
