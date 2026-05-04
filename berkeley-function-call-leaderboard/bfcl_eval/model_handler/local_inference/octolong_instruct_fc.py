@@ -118,7 +118,10 @@ class OctoLongInstructFCHandler(OSSHandler):
     def _pre_query_processing_prompting(self, test_entry: dict) -> dict:
         functions: list = test_entry["function"]
 
-        return {"message": [], "function": functions}
+        return {
+            "message": [{"role": "system", "content": "You are OctoLong, a helpful and interactive tool-calling agent."}],
+            "function": functions,
+        }
 
     @override
     def _parse_query_response_prompting(self, api_response: Any) -> dict:

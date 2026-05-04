@@ -3,6 +3,8 @@ from typing import Any
 from bfcl_eval.model_handler.local_inference.base_oss_handler import OSSHandler
 from overrides import override
 
+OCTOLONG_SYSTEM_PROMPT = "You are OctoLong, a helpful and interactive tool-calling agent."
+
 
 class OctoLongHandler(OSSHandler):
     def __init__(
@@ -15,6 +17,16 @@ class OctoLongHandler(OSSHandler):
         **kwargs,
     ) -> None:
         super().__init__(model_name, temperature, registry_name, is_fc_model, **kwargs)
+
+    @override
+    def _pre_query_processing_prompting(self, test_entry: dict) -> dict:
+        inference_data = super()._pre_query_processing_prompting(test_entry)
+        # super() already injected a system prompt with function docs into test_entry["question"][0]
+        # Prepend OctoLong identity to that system message
+        first_turn = test_entry["question"][0]
+        if first_turn and first_turn[0]["role"] == "system":
+            first_turn[0]["content"] = OCTOLONG_SYSTEM_PROMPT + "\n\n" + first_turn[0]["content"]
+        return inference_data
 
     @override
     def _format_prompt(self, messages, function):
