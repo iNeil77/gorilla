@@ -10,42 +10,59 @@ The text-only ``Qwen3_5ForCausalLM`` class already exists in
 ``vllm.model_executor.models.qwen3_5`` — it just isn't wired into the
 registry, and the upstream class also forgets to inherit from
 ``IsHybrid``, which means vLLM never runs the hybrid-mamba config hook
-that populates ``mamba_block_size``. This plugin:
+that populates ``mamba_block_size``.
 
-1. Registers ``Qwen3_5ForCausalLM`` under that arch name so vLLM picks
-   the text-only class instead of the multimodal one.
-2. Stamps ``is_hybrid = True`` on the class so vLLM treats it as a
-   hybrid attention/mamba model and applies the right cache defaults.
+We define a thin subclass with ``is_hybrid = True`` and register it
+under the ``Qwen3_5ForCausalLM`` arch name. Because vLLM introspects
+the registered class in a subprocess via the lazy-import string
+(``<module>:<class>``), the class definition has to live in an
+importable module rather than be patched at runtime — otherwise the
+subprocess re-imports the upstream class without our patch.
 
 The plugin runs in every vLLM process (the ``bfcl generate`` parent, the
 ``vllm serve`` API process, and the engine-core / worker subprocesses).
 """
 
+try:
+    from vllm.model_executor.models.qwen3_5 import (
+        Qwen3_5ForCausalLM as _Qwen3_5ForCausalLMTextBase,
+    )
+except Exception:
+    _Qwen3_5ForCausalLMTextBase = None
+
+
+if _Qwen3_5ForCausalLMTextBase is not None:
+
+    class Qwen3_5ForCausalLMHybrid(_Qwen3_5ForCausalLMTextBase):
+        """Text-only Qwen3.5 causal LM with the IsHybrid marker upstream forgot.
+
+        See module docstring for the full rationale.
+        """
+
+        is_hybrid = True
+
+else:
+    Qwen3_5ForCausalLMHybrid = None  # type: ignore[assignment]
+
 
 def register_qwen3_5_text_arch_alias() -> None:
     try:
         from vllm import ModelRegistry
-        from vllm.model_executor.models.qwen3_5 import Qwen3_5ForCausalLM
     except ImportError:
         return
 
-    # Mark as hybrid so HybridAttentionMambaModelConfig.verify_and_update_config
-    # runs and populates mamba_block_size for the GDN linear-attention layers.
-    if not getattr(Qwen3_5ForCausalLM, "is_hybrid", False):
-        try:
-            Qwen3_5ForCausalLM.is_hybrid = True
-        except Exception:
-            pass
+    if Qwen3_5ForCausalLMHybrid is None:
+        return
 
     existing = ModelRegistry.models.get("Qwen3_5ForCausalLM")
     existing_class = getattr(existing, "class_name", None)
-    if existing_class == "Qwen3_5ForCausalLM":
+    if existing_class == "Qwen3_5ForCausalLMHybrid":
         return
 
     try:
         ModelRegistry.register_model(
             "Qwen3_5ForCausalLM",
-            "vllm.model_executor.models.qwen3_5:Qwen3_5ForCausalLM",
+            "bfcl_eval._vllm_plugins:Qwen3_5ForCausalLMHybrid",
         )
     except Exception:
         pass
