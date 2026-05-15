@@ -1,118 +1,17 @@
+"""Check function-description format for Python single-turn test categories.
+
+Exposed via the bfcl CLI as ``bfcl check-func-doc``. The section on
+checking the correct type in the enum field is modified from the script
+that Chuanhui Zhang (@zhangch-ss) provided in
+https://github.com/ShishirPatil/gorilla/pull/826.
+"""
+
 from keyword import kwlist
 
 from bfcl_eval._llm_response_generation import parse_test_category_argument
 from bfcl_eval.constants.eval_config import PROMPT_PATH
 from bfcl_eval.utils import is_java, is_js, load_file
 
-"""
-This script checks for the correct format of the function description for test category in Python.
-
-To run this script, use the following command:
-```
-cd berkeley-function-call-leaderboard/bfcl_eval/scripts
-python check_func_doc_format.py
-```
-
-The section on checking correct type in the enum field is modified from the script that Chuanhui Zhang (@zhangch-ss) provided in https://github.com/ShishirPatil/gorilla/pull/826. Credit to him for the original idea and implementation. 
-
-
-# Function Schema Validation Rules and Error Cases
-
-## Top-Level Structure
-The function description must be a dictionary with exactly three fields:
-- `name`: Function name
-- `description`: Function description
-- `parameters`: Parameter information dictionary
-
-## Parameters Object Structure
-The `parameters` field must be a dictionary with exactly three fields:
-- `type`: Must be "dict"
-- `properties`: Dictionary of parameter definitions
-- `required`: List of required parameter names
-
-## Parameter Definition Rules
-
-### Basic Parameter Structure
-Each parameter in `properties` must be a dictionary containing:
-- `type`: One of ["boolean", "array", "string", "integer", "float", "tuple", "any", "dict"]
-- `description`: String describing the parameter
-
-### Type-Specific Rules
-
-#### For Array/Tuple Types
-- Must include `items` field
-- `items` must be a dictionary with single field `type`
-- Cannot have `properties` field
-- Item type must be one of the allowed types
-
-#### For Dict Type
-Must have either:
-- `properties` field with nested parameter definitions, OR
-- `additionalProperties` field with `type` specification
-Cannot have `items` field
-
-#### For Basic Types (boolean, string, integer, float, any)
-- Cannot have `items` field
-- Cannot have `properties` field
-
-### Optional Fields
-
-#### Enum Field
-If present:
-- Must be a list
-- All values must match the parameter's declared type
-
-#### Default Value
-- Required for optional parameters (those not in `required` list)
-- Must not exist for required parameters
-- Must match the parameter's declared type
-- For `any` type, no type checking is performed
-
-### Parameter Naming
-- Cannot use Python keywords as parameter names
-- Cannot have duplicate parameter names
-
-## Error Cases
-
-1. Top-Level Structure Errors:
-   - Input is not a dictionary
-   - Missing required fields (name, description, parameters)
-   - Extra fields present
-   - Parameters field is not a dictionary
-
-2. Parameters Object Errors:
-   - Missing type/properties/required fields
-   - Extra fields present
-   - Required field is not a list
-   - Required parameter listed but not in properties
-   - Required parameter has default value
-   - Optional parameter missing default value
-
-3. Parameter Definition Errors:
-   - Parameter value is not a dictionary
-   - Missing type or description
-   - Invalid type specified
-   - Python keyword used as parameter name
-   - Duplicate parameter names
-
-4. Type-Specific Errors:
-   - Array/tuple without items field
-   - Array/tuple with properties field
-   - Dict without properties or additionalProperties
-   - Dict with items field
-   - Non-array with items field
-   - Non-dict with properties field
-
-5. Enum Validation Errors:
-   - Enum field is not a list
-   - Enum values don't match declared type
-
-6. Default Value Errors:
-   - Default value type doesn't match declared type
-   - Required parameter has default value
-   - Optional parameter missing default value
-
-"""
 
 TYPE_MAP = {
     "int": int,
@@ -142,10 +41,7 @@ AVAILABLE_TYPES = [
     "tuple",
     "any",
     "dict",
-]  # python
-
-entry_id_with_problem = set()
-test_categories_total, test_filename_total = parse_test_category_argument(["single_turn"])
+]
 
 
 def format_checker(func_description: dict):
@@ -217,7 +113,6 @@ def format_checker(func_description: dict):
 
     all_param = list(properties.keys())
 
-    # Check for default and optional parameters
     required = parameters["required"]
     if type(required) != list:
         return False, "The 'required' field must be a list of required parameters."
@@ -250,15 +145,9 @@ def param_checker(properties: dict):
             False,
             "The 'properties' field must be a dictionary. Each key in the dictionary should be a parameter name, and the value should be a dictionary describing the parameter (with the 'type' and 'description' fields).",
         )
-    if type(properties) != dict:
-        return (
-            False,
-            "The 'properties' field must be a dictionary. Each key in the dictionary should be a parameter name, and the value should be a dictionary describing the parameter (with the 'type' and 'description' fields).",
-        )
 
     all_param = []
     for param_name, param_details in properties.items():
-
         if param_name in kwlist:
             return (
                 False,
@@ -402,22 +291,24 @@ def param_checker(properties: dict):
     return True, "Parameter is correctly formatted."
 
 
-for test_category, file_path in zip(test_categories_total, test_filename_total):
-    # We only care about Python test cases; Java and JavaScript test cases have different rules
-    if is_java(test_category) or is_js(test_category):
-        continue
-    dataset_data = load_file(PROMPT_PATH / file_path)
-    for test_entry in dataset_data:
-        for function in test_entry["function"]:
-            valid, message = format_checker(function)
-            if not valid:
-                print("--------------------")
-                print(f"Entry ID: {test_entry['id']}")
-                print(f"Function: {function['name']}")
-                print(f"Error: {message}")
-                entry_id_with_problem.add(test_entry["id"])
+def run() -> None:
+    entry_id_with_problem: set = set()
+    test_categories_total, test_filename_total = parse_test_category_argument(["single_turn"])
 
+    for test_category, file_path in zip(test_categories_total, test_filename_total):
+        if is_java(test_category) or is_js(test_category):
+            continue
+        dataset_data = load_file(PROMPT_PATH / file_path)
+        for test_entry in dataset_data:
+            for function in test_entry["function"]:
+                valid, message = format_checker(function)
+                if not valid:
+                    print("--------------------")
+                    print(f"Entry ID: {test_entry['id']}")
+                    print(f"Function: {function['name']}")
+                    print(f"Error: {message}")
+                    entry_id_with_problem.add(test_entry["id"])
 
-print("--------------------")
-print(f"The following {len(entry_id_with_problem)} entries have problems:")
-print(entry_id_with_problem)
+    print("--------------------")
+    print(f"The following {len(entry_id_with_problem)} entries have problems:")
+    print(entry_id_with_problem)

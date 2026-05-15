@@ -31,6 +31,10 @@ class ExecutionOrderGroup(typer.core.TyperGroup):
             "evaluate",
             "scores",
             "score",
+            "check-func-doc",
+            "check-illegal-params",
+            "compile-multi-turn-func-doc",
+            "visualize-multi-turn-gt",
             "version",
         ]
 
@@ -62,9 +66,13 @@ def handle_multiple_input(input_str):
 @cli.command()
 def version():
     """
-    Show the bfcl version. PyPI versions are in development, please rely on the commit hash for reproducibility.
+    Show the bfcl version. Rely on the commit hash for reproducibility.
     """
-    print(f"bfcl version: {_version('bfcl')} \nNote: pypi versions are in development, please rely on the commit hash for reproducibility.")
+    try:
+        v = _version("bfcl_eval")
+    except Exception:
+        v = "unknown"
+    print(f"bfcl version: {v}\nNote: rely on the commit hash for reproducibility.")
 
 @cli.command()
 def test_categories():
@@ -373,6 +381,42 @@ def score(
         resolved_score_dir = (PROJECT_ROOT / score_dir).resolve()
 
     raise typer.Exit(code=report_scores(model, split, resolved_score_dir))
+
+
+@cli.command(name="check-func-doc")
+def check_func_doc():
+    """
+    Check function-description format for Python single-turn test categories.
+    """
+    from bfcl_eval.scripts.check_func_doc_format import run as _run
+    _run()
+
+
+@cli.command(name="check-illegal-params")
+def check_illegal_params():
+    """
+    Rewrite illegal Python parameter names in single-turn datasets in place.
+    """
+    from bfcl_eval.scripts.check_illegal_python_param_name import run as _run
+    _run()
+
+
+@cli.command(name="compile-multi-turn-func-doc")
+def compile_multi_turn_func_doc():
+    """
+    Compile per-class JSON function docs for multi-turn evaluation.
+    """
+    from bfcl_eval.scripts.compile_multi_turn_func_doc import run as _run
+    _run()
+
+
+@cli.command(name="visualize-multi-turn-gt")
+def visualize_multi_turn_gt():
+    """
+    Render ground-truth conversation traces for multi-turn categories.
+    """
+    from bfcl_eval.scripts.visualize_multi_turn_ground_truth_conversation import run as _run
+    _run()
 
 
 if __name__ == "__main__":

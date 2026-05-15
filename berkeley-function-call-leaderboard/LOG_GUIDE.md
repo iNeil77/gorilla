@@ -27,11 +27,10 @@ For single-turn categories, the only log entry available is the inference input 
 
 ## Ground Truth
 
-For multi-turn categories, we understand the provided ground truth may seem nonsensical without context. We have provided a utility script to simulate a conversation between the ground truth and the system:
+For multi-turn categories, we understand the provided ground truth may seem nonsensical without context. A `bfcl` subcommand simulates a conversation between the ground truth and the system:
 
 ```bash
-cd berkeley-function-call-leaderboard/bfcl_eval/scripts
-python visualize_multi_turn_ground_truth_conversation.py
+uv run bfcl visualize-multi-turn-gt
 ```
 
-The generated conversation logs will be saved in `berkeley-function-call-leaderboard/bfcl_eval/scripts/ground_truth_conversation`.
+The generated conversation logs will be saved under `bfcl_eval/scripts/ground_truth_conversation/`.

@@ -1,4 +1,3 @@
-import argparse
 import statistics
 from collections import defaultdict
 
@@ -18,7 +17,6 @@ from bfcl_eval.eval_checker.multi_turn_eval.multi_turn_utils import (
 from bfcl_eval.model_handler.base_handler import BaseHandler
 from bfcl_eval.model_handler.utils import parse_prompt_variation_params
 from bfcl_eval.utils import *
-from dotenv import load_dotenv
 from tqdm import tqdm
 
 
@@ -866,49 +864,4 @@ def main(model, test_categories, result_dir, score_dir, partial_eval: bool = Fal
         )
     print(
         f"See {score_dir / 'data_live.csv'}, {score_dir / 'data_non_live.csv'}, {score_dir / 'data_multi_turn.csv'}, {score_dir / 'data_agentic.csv'} and {score_dir / 'data_format_sensitivity.csv'} for detailed evaluation results on each sub-section categories respectively."
-    )
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Process two lists of strings.")
-
-    # Add arguments for two lists of strings
-    parser.add_argument(
-        "--model", nargs="+", type=str, help="A list of model names to evaluate"
-    )
-    parser.add_argument(
-        "--test-category",
-        nargs="+",
-        type=str,
-        default="all",
-        help="A list of test categories to run the evaluation on",
-    )
-    parser.add_argument(
-        "--result-dir",
-        default=None,
-        type=str,
-        help="Path to the folder where the model response files are stored; relative to the `berkeley-function-call-leaderboard` root folder",
-    )
-    parser.add_argument(
-        "--score-dir",
-        default=None,
-        type=str,
-        help="Path to the folder where the evaluation score files will be stored; relative to the `berkeley-function-call-leaderboard` root folder",
-    )
-    parser.add_argument(
-        "--partial-eval",
-        default=False,
-        action="store_true",
-        help="Run evaluation on a partial set of benchmark entries (eg. entries present in the model result files) without raising for missing IDs.",
-    )
-
-    args = parser.parse_args()
-
-    load_dotenv(dotenv_path=DOTENV_PATH, verbose=True, override=True)  # Load the .env file
-    main(
-        args.model,
-        args.test_category,
-        args.result_dir,
-        args.score_dir,
-        partial_eval=args.partial_eval,
     )
