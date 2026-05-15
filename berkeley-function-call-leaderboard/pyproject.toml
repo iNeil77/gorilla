@@ -51,6 +51,9 @@ dependencies = [
 [project.scripts]
 bfcl = "bfcl_eval.__main__:cli"
 
+[project.entry-points."vllm.general_plugins"]
+bfcl_qwen3_5_text_arch = "bfcl_eval._vllm_plugins:register_qwen3_5_text_arch_alias"
+
 [tool.setuptools]
 include-package-data = true
 
