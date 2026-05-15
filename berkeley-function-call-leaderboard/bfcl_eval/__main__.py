@@ -16,6 +16,7 @@ from bfcl_eval.constants.eval_config import (
 )
 from bfcl_eval.constants.model_config import MODEL_CONFIG_MAPPING
 from bfcl_eval.eval_checker.eval_runner import main as evaluation_main
+from bfcl_eval.score_split import SPLIT_ALIASES, report_scores
 from dotenv import load_dotenv
 from tabulate import tabulate
 
@@ -29,6 +30,7 @@ class ExecutionOrderGroup(typer.core.TyperGroup):
             "results",
             "evaluate",
             "scores",
+            "score",
             "version",
         ]
 
@@ -338,6 +340,39 @@ def scores(
             print(tabulate(data, headers=selected_columns, tablefmt="grid"))
     else:
         print(f"\nFile {file} not found.\n")
+
+
+@cli.command()
+def score(
+    model: str = typer.Option(
+        ...,
+        "--model",
+        help="Model identifier as passed to bfcl evaluate (e.g. yantri-tool/Qwen3-8B-FC).",
+    ),
+    split: Optional[str] = typer.Option(
+        None,
+        "--split",
+        help=f"One of: {', '.join(sorted(SPLIT_ALIASES.keys()))}. If omitted, all available splits are reported with a grand total.",
+    ),
+    score_dir: Optional[str] = typer.Option(
+        None,
+        "--score-dir",
+        help="Relative path to the evaluation score folder, if different from the default; Path should be relative to the `berkeley-function-call-leaderboard` root folder",
+    ),
+):
+    """
+    Print per-category top-line scores for a model, optionally scoped to one split.
+    """
+    if split is not None and split not in SPLIT_ALIASES:
+        valid = ", ".join(sorted(SPLIT_ALIASES.keys()))
+        raise typer.BadParameter(f"--split must be one of: {valid}")
+
+    if score_dir is None:
+        resolved_score_dir = SCORE_PATH
+    else:
+        resolved_score_dir = (PROJECT_ROOT / score_dir).resolve()
+
+    raise typer.Exit(code=report_scores(model, split, resolved_score_dir))
 
 
 if __name__ == "__main__":
