@@ -22,14 +22,15 @@ SPLIT_ALIASES = {
     "multi-turn": "multi_turn",
     "multi_turn": "multi_turn",
     "multiturn": "multi_turn",
+    "agentic": "agentic",
 }
 
-DEFAULT_SPLIT_ORDER = ["non_live", "live", "multi_turn"]
+DEFAULT_SPLIT_ORDER = ["non_live", "live", "multi_turn", "agentic"]
 
 
 def _load_split_rows(split_dir: Path):
     rows = []
-    for score_file in sorted(split_dir.glob("*_score.json")):
+    for score_file in sorted(split_dir.rglob("*_score.json")):
         with score_file.open() as f:
             top_line = json.loads(f.readline())
         category = score_file.stem.removesuffix("_score")
