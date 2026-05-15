@@ -178,10 +178,21 @@ def generate(
         "--max-model-len",
         help="Override the maximum model context length passed to vLLM/SGLang. If not set, uses the value from the model config.",
     ),
+    backend_extra_args: Optional[List[str]] = typer.Option(
+        None,
+        "--backend-extra-args",
+        help='Extra arguments to forward verbatim to the underlying "vllm serve" / "sglang.launch_server" command. Pass a single string per use; the value is split on spaces (use shell quoting if a value itself contains spaces). Repeat the flag to add more. Example: --backend-extra-args="--language-model-only --reasoning-parser qwen3".',
+    ),
 ):
     """
     Generate the LLM response for one or more models on a test-category (same as openfunctions_evaluation.py).
     """
+
+    flat_extra_args: Optional[List[str]] = None
+    if backend_extra_args:
+        flat_extra_args = []
+        for chunk in backend_extra_args:
+            flat_extra_args.extend(chunk.split())
 
     args = SimpleNamespace(
         model=model,
@@ -202,6 +213,7 @@ def generate(
         max_lora_rank=max_lora_rank,
         lora_modules=lora_modules,
         max_model_len=max_model_len,
+        backend_extra_args=flat_extra_args,
     )
     load_dotenv(dotenv_path=DOTENV_PATH, verbose=True, override=True)  # Load the .env file
     generation_main(args)

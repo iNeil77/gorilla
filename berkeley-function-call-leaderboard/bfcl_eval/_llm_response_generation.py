@@ -265,6 +265,7 @@ def generate_results(args, model_name, test_cases_total):
                 enable_lora=args.enable_lora,
                 max_lora_rank=args.max_lora_rank,
                 max_model_len=getattr(args, "max_model_len", None),
+                backend_extra_args=getattr(args, "backend_extra_args", None),
             )
 
         # ───── dependency bookkeeping ──────────────────────────────

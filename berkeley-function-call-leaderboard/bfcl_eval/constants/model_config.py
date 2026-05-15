@@ -2274,6 +2274,18 @@ local_inference_model_map = {
         is_fc_model=True,
         underscore_to_dot=False,
     ),
+    "yantri-tool/Qwen3.5-9B-FC": ModelConfig(
+        model_name="yantri-tool/Qwen3.5-9B-FC",
+        display_name="Yantri-Qwen3.5-9B (FC)",
+        url="https://huggingface.co/yantri-tool/Qwen3.5-9B-FC",
+        org="yantri-tool",
+        license="apache-2.0",
+        model_handler=OctoLongInstructFCHandler,
+        input_price=None,
+        output_price=None,
+        is_fc_model=True,
+        underscore_to_dot=False,
+    ),
 }
 
 # Inference through third-party inference platforms for open-source models

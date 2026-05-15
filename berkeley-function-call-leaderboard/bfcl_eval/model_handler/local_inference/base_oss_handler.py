@@ -83,6 +83,7 @@ class OSSHandler(BaseHandler, EnforceOverrides):
         enable_lora: bool = False,
         max_lora_rank: Optional[int] = None,
         max_model_len: Optional[int] = None,
+        backend_extra_args: Optional[list[str]] = None,
     ):
         """
         Spin up a local server for the model.
@@ -162,6 +163,7 @@ class OSSHandler(BaseHandler, EnforceOverrides):
         self._stop_event = threading.Event()
         try:
             if not skip_server_setup:
+                extra_args = list(backend_extra_args) if backend_extra_args else []
                 if backend == "vllm":
                     process = subprocess.Popen(
                         [
@@ -193,7 +195,8 @@ class OSSHandler(BaseHandler, EnforceOverrides):
                             )
                             if lora_modules
                             else []
-                        ),
+                        )
+                        + extra_args,
                         stdout=subprocess.PIPE,  # Capture stdout
                         stderr=subprocess.PIPE,  # Capture stderr
                         text=True,  # To get the output as text instead of bytes
@@ -216,7 +219,8 @@ class OSSHandler(BaseHandler, EnforceOverrides):
                             "--mem-fraction-static",
                             str(gpu_memory_utilization),
                             "--trust-remote-code",
-                        ],
+                        ]
+                        + extra_args,
                         stdout=subprocess.PIPE,  # Capture stdout
                         stderr=subprocess.PIPE,  # Capture stderr
                         text=True,  # To get the output as text instead of bytes
