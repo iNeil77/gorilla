@@ -10,14 +10,31 @@ The text-only ``Qwen3_5ForCausalLM`` class already exists in
 ``vllm.model_executor.models.qwen3_5`` — it just isn't wired into the
 registry, and the upstream class also forgets to inherit from
 ``IsHybrid``, which means vLLM never runs the hybrid-mamba config hook
-that populates ``mamba_block_size``.
+that populates ``mamba_block_size``. The Qwen3.5 base config also ships
+``rope_parameters.mrope_section`` (a remnant of the multimodal config
+template), which makes vLLM's ``uses_mrope(config)`` return True and
+require the model class to implement ``SupportsMRoPE`` — which is
+trivially degenerate for text-only inputs (T==H==W positions are the
+token index).
 
-We define a thin subclass with ``is_hybrid = True`` and register it
-under the ``Qwen3_5ForCausalLM`` arch name. Because vLLM introspects
-the registered class in a subprocess via the lazy-import string
-(``<module>:<class>``), the class definition has to live in an
-importable module rather than be patched at runtime — otherwise the
-subprocess re-imports the upstream class without our patch.
+We define a thin subclass that:
+
+1. Sets ``is_hybrid = True`` so HybridAttentionMambaModelConfig runs
+   and ``mamba_block_size`` is populated for the GDN linear-attention
+   layers.
+2. Lifts ``get_mamba_state_*`` classmethods that upstream only
+   defines on the multimodal wrapper.
+3. Implements ``SupportsMRoPE`` with the text-only degenerate case
+   (``llm_positions = arange(N)`` broadcast to ``[3, N]``,
+   ``mrope_position_delta = 0``) so the engine accepts text-only
+   checkpoints whose configs declare ``mrope_section``.
+
+We register the subclass under the ``Qwen3_5ForCausalLM`` arch name.
+Because vLLM introspects the registered class in a subprocess via the
+lazy-import string (``<module>:<class>``), the class definition has to
+live in an importable module rather than be patched at runtime —
+otherwise the subprocess re-imports the upstream class without our
+patch.
 
 The plugin runs in every vLLM process (the ``bfcl generate`` parent, the
 ``vllm serve`` API process, and the engine-core / worker subprocesses).
@@ -34,7 +51,8 @@ except Exception:
 if _Qwen3_5ForCausalLMTextBase is not None:
 
     class Qwen3_5ForCausalLMHybrid(_Qwen3_5ForCausalLMTextBase):
-        """Text-only Qwen3.5 causal LM with the IsHybrid marker upstream forgot.
+        """Text-only Qwen3.5 causal LM with the IsHybrid + SupportsMRoPE
+        markers upstream forgot.
 
         Also lifts the gated-delta-net mamba-state classmethods that vLLM's
         block-size alignment looks up directly on the model class. Upstream
@@ -47,6 +65,7 @@ if _Qwen3_5ForCausalLMTextBase is not None:
         """
 
         is_hybrid = True
+        supports_mrope = True
 
         @classmethod
         def get_mamba_state_dtype_from_config(cls, vllm_config):
@@ -91,6 +110,20 @@ if _Qwen3_5ForCausalLMTextBase is not None:
             )
 
             return MambaStateCopyFuncCalculator.gated_delta_net_state_copy_func()
+
+        def get_mrope_input_positions(self, input_tokens, mm_features):
+            # Text-only degenerate case: there are never any mm_features, so
+            # T/H/W positions all collapse to the token-index axis and the
+            # delta is 0. This satisfies vllm's SupportsMRoPE Protocol when
+            # uses_mrope(config) is True purely because the checkpoint's
+            # config carries an mrope_section field inherited from the
+            # Qwen3.5-VL base config template.
+            import numpy as np
+            import torch
+
+            n = len(input_tokens)
+            llm_positions = np.broadcast_to(np.arange(n, dtype=np.int64), (3, n))
+            return torch.from_numpy(llm_positions.copy()), 0
 
 else:
     Qwen3_5ForCausalLMHybrid = None  # type: ignore[assignment]
