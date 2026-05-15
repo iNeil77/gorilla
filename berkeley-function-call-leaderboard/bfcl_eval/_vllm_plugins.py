@@ -36,10 +36,61 @@ if _Qwen3_5ForCausalLMTextBase is not None:
     class Qwen3_5ForCausalLMHybrid(_Qwen3_5ForCausalLMTextBase):
         """Text-only Qwen3.5 causal LM with the IsHybrid marker upstream forgot.
 
+        Also lifts the gated-delta-net mamba-state classmethods that vLLM's
+        block-size alignment looks up directly on the model class. Upstream
+        only defines them on the multimodal Qwen3_5ForConditionalGeneration
+        wrapper, but their bodies only read fields that exist on the
+        text-only HF config (linear_num_key_heads, linear_value_head_dim,
+        etc.), so they work fine for text-only checkpoints.
+
         See module docstring for the full rationale.
         """
 
         is_hybrid = True
+
+        @classmethod
+        def get_mamba_state_dtype_from_config(cls, vllm_config):
+            from vllm.model_executor.layers.mamba.mamba_utils import (
+                MambaStateDtypeCalculator,
+            )
+
+            return MambaStateDtypeCalculator.gated_delta_net_state_dtype(
+                vllm_config.model_config.dtype,
+                vllm_config.cache_config.mamba_cache_dtype,
+                vllm_config.cache_config.mamba_ssm_cache_dtype,
+            )
+
+        @classmethod
+        def get_mamba_state_shape_from_config(cls, vllm_config):
+            from vllm.model_executor.layers.mamba.mamba_utils import (
+                MambaStateShapeCalculator,
+            )
+
+            parallel_config = vllm_config.parallel_config
+            hf_config = vllm_config.model_config.hf_text_config
+            tp_size = parallel_config.tensor_parallel_size
+            num_spec = (
+                vllm_config.speculative_config.num_speculative_tokens
+                if vllm_config.speculative_config
+                else 0
+            )
+            return MambaStateShapeCalculator.gated_delta_net_state_shape(
+                tp_size,
+                hf_config.linear_num_key_heads,
+                hf_config.linear_num_value_heads,
+                hf_config.linear_key_head_dim,
+                hf_config.linear_value_head_dim,
+                hf_config.linear_conv_kernel_dim,
+                num_spec,
+            )
+
+        @classmethod
+        def get_mamba_state_copy_func(cls):
+            from vllm.model_executor.layers.mamba.mamba_utils import (
+                MambaStateCopyFuncCalculator,
+            )
+
+            return MambaStateCopyFuncCalculator.gated_delta_net_state_copy_func()
 
 else:
     Qwen3_5ForCausalLMHybrid = None  # type: ignore[assignment]
