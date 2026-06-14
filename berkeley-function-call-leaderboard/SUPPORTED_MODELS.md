@@ -157,6 +157,8 @@ For model names containing `{...}`, multiple versions are available. For example
 | xLAM-2-8b-fc-r                         | Function Calling | Self-hosted 💻 | Salesforce/Llama-xLAM-2-8b-fc-r                             |
 | Yantri-Qwen3-8B                        | Function Calling | Self-hosted 💻 | yantri-tool/Qwen3-8B-FC                                     |
 | Yantri-Qwen3.5-9B                      | Function Calling | Self-hosted 💻 | yantri-tool/Qwen3.5-9B-FC                                   |
+| CodeShield-Qwen3.5-{0.8B,2B,4B,9B}-Instruct | Function Calling | Self-hosted 💻 | CodeShield/Qwen3.5-{0.8B,2B,4B,9B}-Instruct-FC           |
+| Yantri-Qwen3.5-{0.8B,2B,4B,9B}-R2      | Function Calling | Self-hosted 💻 | yantri-tool/Qwen3.5-{0.8B,2B,4B,9B}-FC-R2                   |
 
 ---
 
