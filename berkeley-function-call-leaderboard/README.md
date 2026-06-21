@@ -25,6 +25,7 @@
       - [Output Structure](#output-structure)
       - [(Optional) WandB Evaluation Logging](#optional-wandb-evaluation-logging)
       - [(Alternate) Script Execution for Evaluation](#alternate-script-execution-for-evaluation)
+    - [Reporting Per-Split Scores](#reporting-per-split-scores)
   - [Contributing \& How to Add New Models](#contributing--how-to-add-new-models)
   - [Additional Resources](#additional-resources)
 
@@ -190,21 +191,42 @@ uv run bfcl generate --model MODEL_NAME --test-category TEST_CATEGORY --num-thre
 
 #### For Locally-hosted OSS Models
 
+A typical run pins one GPU, picks a free port, sets a context cap that fits the model, and allows overwriting prior results:
+
+```bash
+CUDA_VISIBLE_DEVICES=4 LOCAL_SERVER_PORT=1092 uv run --extra oss_eval_vllm bfcl generate \
+  --model "Qwen/Qwen3-4B-Instruct-2507-FC" \
+  --test-category "non_live,live,multi_turn" \
+  --backend vllm \
+  --num-gpus 1 \
+  --max-model-len 131072 \
+  --gpu-memory-utilization 0.95 \
+  --allow-overwrite
+```
+
+The full set of generation flags (combine as needed):
+
 ```bash
 uv run --extra oss_eval_vllm bfcl generate \
   --model MODEL_NAME \
   --test-category TEST_CATEGORY \
   --backend {sglang|vllm} \
   --num-gpus 1 \
+  --max-model-len 65536 \
   --gpu-memory-utilization 0.9 \
+  --allow-overwrite \
   --local-model-path /path/to/base/model \
   --enable-lora \
   --max-lora-rank 128 \
   --lora-modules module1="/path/to/lora/adapter1" module2="/path/to/lora/adapter2" # ← optional
 ```
 
+- `CUDA_VISIBLE_DEVICES` pins the GPU(s) the spawned `vllm serve` / `sglang.launch_server` will use; without it, the process will grab GPU 0 by default.
+- `LOCAL_SERVER_PORT` (default `1053`) is read by both the spawned server and the OpenAI client; override it when running multiple models in parallel on the same host. `LOCAL_SERVER_ENDPOINT` overrides the host (default `localhost`).
 - Choose your backend using `--backend sglang` or `--backend vllm`. The default backend is `vllm`.
-- Control GPU usage by adjusting `--num-gpus` (default `1`, relevant for multi-GPU tensor parallelism) and `--gpu-memory-utilization` (default `0.9`), which can help avoid out-of-memory errors.
+- `--num-gpus` (default `1`) sets tensor-parallel size; `--gpu-memory-utilization` (default `0.9`) can be lowered if you OOM, or raised toward `0.95` if you have headroom.
+- `--max-model-len` overrides the engine's max context length. Set it to the largest value your VRAM supports for the model — the default in the model config is often the upstream "billboard" length (e.g. 1M) which won't fit on a single GPU.
+- `--allow-overwrite` (or `-o`) regenerates over any existing result files for this model.
 - `--local-model-path` (optional): Point this flag at a directory that already contains the model's files (`config.json`, tokenizer, weights, etc.). Use it only when you've pre-downloaded the model and the weights live somewhere other than the default `$HF_HOME` cache.
 - `--enable-lora` (optional): Enable LoRA for the vLLM backend. This flag is required to use LoRA modules. This only works when backend is `vllm`.
 - `--max-lora-rank` (optional): Specify the maximum LoRA rank for the vLLM backend. This is an integer value. This only works when backend is `vllm` and `--enable-lora` flag is set.
@@ -235,9 +257,17 @@ REMOTE_OPENAI_TOKENIZER_PATH=/path/to/local/tokenizer  # Optional: specify local
 
 ### Evaluating Generated Responses
 
-**Important:** You must have generated the model responses before running the evaluation.
+**Important:** You must have generated the model responses before running the evaluation. Evaluation is pure-Python scoring against the cached generation results — no GPU, no vLLM extra, and no `LOCAL_SERVER_PORT` is needed.
 
 Once you have the results, run:
+
+```bash
+uv run bfcl evaluate \
+  --model "Qwen/Qwen3-4B-Instruct-2507-FC" \
+  --test-category "non_live,live,multi_turn"
+```
+
+The general form:
 
 ```bash
 uv run bfcl evaluate --model MODEL_NAME --test-category TEST_CATEGORY
@@ -279,6 +309,26 @@ extra and set `WANDB_BFCL_PROJECT=ENTITY:PROJECT` in `.env`:
 ```bash
 uv sync --extra wandb
 ```
+
+### Reporting Per-Split Scores
+
+After `bfcl evaluate` writes the per-category `*_score.json` files, `bfcl score` reads them and prints per-split top-line numbers — one block per split (`non_live`, `live`, `multi_turn`, `agentic`) plus an overall block with macro and micro averages across the splits actually present on disk:
+
+```bash
+uv run bfcl score --model "Qwen/Qwen3-4B-Instruct-2507-FC"
+```
+
+Scope the report to a single split with `--split`:
+
+```bash
+uv run bfcl score --model MODEL_NAME --split non_live
+uv run bfcl score --model MODEL_NAME --split live
+uv run bfcl score --model MODEL_NAME --split multi_turn
+```
+
+Accepted aliases: `non_live` / `non-live` / `nonlive`, `multi_turn` / `multi-turn` / `multiturn`, `live`, `agentic`. Pass `--score-dir` to read from a non-default score directory.
+
+Like `evaluate`, this command is CPU-only and needs no extras.
 
 ## Contributing & How to Add New Models
 
