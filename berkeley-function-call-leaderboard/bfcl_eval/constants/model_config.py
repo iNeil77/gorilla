@@ -47,6 +47,7 @@ from bfcl_eval.model_handler.local_inference.granite import (
 )
 from bfcl_eval.model_handler.local_inference.granite_3 import Granite3FCHandler
 from bfcl_eval.model_handler.local_inference.granite_3_3 import Granite33FCHandler
+from bfcl_eval.model_handler.local_inference.mistral_inst_v02 import MistralInstV02Handler
 from bfcl_eval.model_handler.local_inference.smollm3_fc import SmolLM3FCHandler
 from bfcl_eval.model_handler.local_inference.granite_4 import Granite4FCHandler
 from bfcl_eval.model_handler.local_inference.hammer import HammerHandler
@@ -1530,6 +1531,18 @@ local_inference_model_map = {
         is_fc_model=True,
         underscore_to_dot=False,
     ),
+    "ibm-granite/granite-3.1-2b-instruct": ModelConfig(
+        model_name="ibm-granite/granite-3.1-2b-instruct",
+        display_name="Granite-3.1-2B-Instruct (FC)",
+        url="https://huggingface.co/ibm-granite/granite-3.1-2b-instruct",
+        org="IBM",
+        license="Apache-2.0",
+        model_handler=Granite3FCHandler,
+        input_price=None,
+        output_price=None,
+        is_fc_model=True,
+        underscore_to_dot=False,
+    ),
     "ibm-granite/granite-4.0-350m": ModelConfig(
         model_name="ibm-granite/granite-4.0-350m",
         display_name="Granite-4.0-350m (FC)",
@@ -2754,6 +2767,18 @@ local_inference_model_map = {
         underscore_to_dot=False,
     ),
     # Yi-Coder Chat: ChatML template, no native tool-calling — prompt mode only
+    "01-ai/Yi-Coder-1.5B-Chat": ModelConfig(
+        model_name="01-ai/Yi-Coder-1.5B-Chat",
+        display_name="Yi-Coder-1.5B-Chat (Prompt)",
+        url="https://huggingface.co/01-ai/Yi-Coder-1.5B-Chat",
+        org="01.AI",
+        license="apache-2.0",
+        model_handler=QwenHandler,
+        input_price=None,
+        output_price=None,
+        is_fc_model=False,
+        underscore_to_dot=False,
+    ),
     "01-ai/Yi-Coder-9B-Chat": ModelConfig(
         model_name="01-ai/Yi-Coder-9B-Chat",
         display_name="Yi-Coder-9B-Chat (Prompt)",
@@ -2774,6 +2799,19 @@ local_inference_model_map = {
         org="Arcee AI",
         license="apache-2.0",
         model_handler=QwenHandler,
+        input_price=None,
+        output_price=None,
+        is_fc_model=False,
+        underscore_to_dot=False,
+    ),
+    # AWS MegaBeam Mistral 7B 512k: Mistral-7B-Instruct-v0.2 base, [INST]...[/INST] only — prompt mode only
+    "aws-prototyping/MegaBeam-Mistral-7B-512k": ModelConfig(
+        model_name="aws-prototyping/MegaBeam-Mistral-7B-512k",
+        display_name="MegaBeam-Mistral-7B-512k (Prompt)",
+        url="https://huggingface.co/aws-prototyping/MegaBeam-Mistral-7B-512k",
+        org="AWS",
+        license="apache-2.0",
+        model_handler=MistralInstV02Handler,
         input_price=None,
         output_price=None,
         is_fc_model=False,

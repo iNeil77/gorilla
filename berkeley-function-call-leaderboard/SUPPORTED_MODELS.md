@@ -75,7 +75,7 @@ For model names containing `{...}`, multiple versions are available. For example
 | GPT-5.2-2025-12-11                     | Function Calling | OpenAI         | gpt-5.2-2025-12-11-FC                                       |
 | GPT-5.2-2025-12-11                     | Prompt           | OpenAI         | gpt-5.2-2025-12-11                                          |
 | Granite-20b-FunctionCalling            | Function Calling | Self-hosted 💻 | ibm-granite/granite-20b-functioncalling                     |
-| Granite-3.1-8B-Instruct                | Function Calling | Self-hosted 💻 | ibm-granite/granite-3.1-8b-instruct                         |
+| Granite-3.1-{2B,8B}-Instruct           | Function Calling | Self-hosted 💻 | ibm-granite/granite-3.1-{2b,8b}-instruct                    |
 | Granite-3.3-{2B,8B}-Instruct           | Function Calling | Self-hosted 💻 | ibm-granite/granite-3.3-{2b,8b}-instruct                    |
 | Granite-3.2-8B-Instruct                | Function Calling | Self-hosted 💻 | ibm-granite/granite-3.2-8b-instruct                         |
 | Granite-4.0-350m                       | Function Calling | Self-hosted 💻 | ibm-granite/granite-4.0-350m                                |
@@ -168,8 +168,9 @@ For model names containing `{...}`, multiple versions are available. For example
 | xLAM-2-8b-fc-r                         | Function Calling | Self-hosted 💻 | Salesforce/Llama-xLAM-2-8b-fc-r                             |
 | AFM-4.5B                               | Prompt           | Self-hosted 💻 | arcee-ai/AFM-4.5B                                           |
 | InternLM2.5-7B-Chat-1M                 | Prompt           | Self-hosted 💻 | internlm/internlm2_5-7b-chat-1m                             |
+| MegaBeam-Mistral-7B-512k               | Prompt           | Self-hosted 💻 | aws-prototyping/MegaBeam-Mistral-7B-512k                    |
 | SmolLM3-3B                             | Function Calling | Self-hosted 💻 | HuggingFaceTB/SmolLM3-3B-FC                                 |
-| Yi-Coder-9B-Chat                       | Prompt           | Self-hosted 💻 | 01-ai/Yi-Coder-9B-Chat                                      |
+| Yi-Coder-{1.5B,9B}-Chat                | Prompt           | Self-hosted 💻 | 01-ai/Yi-Coder-{1.5B,9B}-Chat                               |
 | Yantri-Qwen3-8B                        | Function Calling | Self-hosted 💻 | yantri-tool/Qwen3-8B-FC                                     |
 | Yantri-Qwen3.5-9B                      | Function Calling | Self-hosted 💻 | yantri-tool/Qwen3.5-9B-FC                                   |
 | CodeShield-Qwen3.5-{0.8B,2B,4B,9B}-Instruct | Function Calling | Self-hosted 💻 | CodeShield/Qwen3.5-{0.8B,2B,4B,9B}-Instruct-FC           |
