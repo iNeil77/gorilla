@@ -52,6 +52,7 @@ For model names containing `{...}`, multiple versions are available. For example
 | Gemma-3-{1b,4b,12b,27b}-it             | Prompt           | Self-hosted 💻 | google/gemma-3-{1b,4b,12b,27b}-it                           |
 | FunctionGemma-270m-it                  | Function Calling | Self-hosted 💻 | google/functiongemma-270m-it-FC                             |
 | GLM-4-9b-Chat                          | Function Calling | Self-hosted 💻 | THUDM/glm-4-9b-chat                                         |
+| GLM-4-9b-Chat-1M                       | Function Calling | Self-hosted 💻 | zai-org/glm-4-9b-chat-1m                                    |
 | GLM-4.5                                | Function Calling | Zhipu AI       | glm-4.5-FC                                                  |
 | GLM-4.5-Air                            | Function Calling | Zhipu AI       | glm-4.5-air-FC                                              |
 | GLM-4.6                                | Function Calling | Zhipu AI       | glm-4.6-FC                                                  |
@@ -75,6 +76,7 @@ For model names containing `{...}`, multiple versions are available. For example
 | GPT-5.2-2025-12-11                     | Prompt           | OpenAI         | gpt-5.2-2025-12-11                                          |
 | Granite-20b-FunctionCalling            | Function Calling | Self-hosted 💻 | ibm-granite/granite-20b-functioncalling                     |
 | Granite-3.1-8B-Instruct                | Function Calling | Self-hosted 💻 | ibm-granite/granite-3.1-8b-instruct                         |
+| Granite-3.3-{2B,8B}-Instruct           | Function Calling | Self-hosted 💻 | ibm-granite/granite-3.3-{2b,8b}-instruct                    |
 | Granite-3.2-8B-Instruct                | Function Calling | Self-hosted 💻 | ibm-granite/granite-3.2-8b-instruct                         |
 | Granite-4.0-350m                       | Function Calling | Self-hosted 💻 | ibm-granite/granite-4.0-350m                                |
 | Grok-4-0709                            | Function Calling | xAI            | grok-4-0709-FC                                              |
@@ -84,6 +86,10 @@ For model names containing `{...}`, multiple versions are available. For example
 | Haha-7B                                | Prompt           | Self-hosted 💻 | ZJared/Haha-7B                                              |
 | Hammer2.1-{0.5b,1.5b,3b,7b}            | Function Calling | Self-hosted 💻 | MadeAgents/Hammer2.1-{0.5b,1.5b,3b,7b}                      |
 | ling-lite-v1.5                         | Prompt           | Ling           | Ling/ling-lite-v1.5                                         |
+| Llama-3-8B-Instruct-262k               | Function Calling | Self-hosted 💻 | gradientai/Llama-3-8B-Instruct-262k-FC                      |
+| Llama-3-8B-ProLong-512k-Instruct       | Function Calling | Self-hosted 💻 | princeton-nlp/Llama-3-8B-ProLong-512k-Instruct-FC           |
+| Llama-3.1-Nemotron-8B-UltraLong-1M-Instruct | Function Calling | Self-hosted 💻 | nvidia/Llama-3.1-Nemotron-8B-UltraLong-1M-Instruct-FC  |
+| Llama-3.1-Nemotron-8B-UltraLong-1M-Instruct | Prompt           | Self-hosted 💻 | nvidia/Llama-3.1-Nemotron-8B-UltraLong-1M-Instruct     |
 | Llama-3.1-{8B,70B}-Instruct            | Function Calling | Self-hosted 💻 | meta-llama/Llama-3.1-{8B,70B}-Instruct-FC                   |
 | Llama-3.1-{8B,70B}-Instruct            | Prompt           | Self-hosted 💻 | meta-llama/Llama-3.1-{8B,70B}-Instruct                      |
 | Llama-3.1-Nemotron-Ultra-253B-v1       | Function Calling | NVIDIA         | nvidia/llama-3.1-nemotron-ultra-253b-v1                     |
@@ -97,7 +103,7 @@ For model names containing `{...}`, multiple versions are available. For example
 | Llama-4-Scout-17B-16E-Instruct         | Function Calling | Self-hosted 💻 | meta-llama/Llama-4-Scout-17B-16E-Instruct-FC                |
 | MiniCPM3-4B                            | Prompt           | Self-hosted 💻 | openbmb/MiniCPM3-4B                                         |
 | MiniCPM3-4B-FC                         | Function Calling | Self-hosted 💻 | openbmb/MiniCPM3-4B-FC                                      |
-| Ministral-8B-Instruct-2410             | Prompt           | Self-hosted 💻 | mistralai/Ministral-8B-Instruct-2410                        |
+| Ministral-8B-Instruct-2410             | Function Calling | Self-hosted 💻 | mistralai/Ministral-8B-Instruct-2410-FC                     |
 | mistral-large-2411                     | Function Calling | Mistral AI     | mistral-large-2411-FC                                       |
 | mistral-large-2411                     | Prompt           | Mistral AI     | mistral-large-2411                                          |
 | Mistral-Medium-2505                    | Function Calling | Mistral AI     | mistral-medium-2505-FC                                      |
@@ -114,6 +120,7 @@ For model names containing `{...}`, multiple versions are available. For example
 | OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M1 | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M1-FC      |
 | OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M2 | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M2-FC      |
 | OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-LC | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-LC-FC      |
+| OctoLong-{0.6B,1.7B,4B,8B,14B}-Instruct | Function Calling | Self-hosted 💻 | OctoLong/OctoLong-{0.6B,1.7B,4B,8B,14B}-Instruct-FC         |
 | o3-2025-04-16                          | Function Calling | OpenAI         | o3-2025-04-16-FC                                            |
 | o3-2025-04-16                          | Prompt           | OpenAI         | o3-2025-04-16                                               |
 | o4-mini-2025-04-16                     | Function Calling | OpenAI         | o4-mini-2025-04-16-FC                                       |
@@ -126,6 +133,10 @@ For model names containing `{...}`, multiple versions are available. For example
 | Phi-4-mini-instruct                    | Prompt           | Self-hosted 💻 | microsoft/Phi-4-mini-instruct                               |
 | Qwen/QwQ-32B                           | Function Calling | Novita AI      | qwen/qwq-32b-FC-novita                                      |
 | Qwen/QwQ-32B                           | Prompt           | Novita AI      | qwen/qwq-32b-novita                                         |
+| Qwen2.5-{0.5B,1.5B,3B,7B,14B,32B,72B}-Instruct | Function Calling | Self-hosted 💻 | Qwen/Qwen2.5-{0.5B,1.5B,3B,7B,14B,32B,72B}-Instruct-FC |
+| Qwen2.5-{0.5B,1.5B,3B,7B,14B,32B,72B}-Instruct | Prompt           | Self-hosted 💻 | Qwen/Qwen2.5-{0.5B,1.5B,3B,7B,14B,32B,72B}-Instruct    |
+| Qwen2.5-{7B,14B}-Instruct-1M           | Function Calling | Self-hosted 💻 | Qwen/Qwen2.5-{7B,14B}-Instruct-1M-FC                        |
+| Qwen2.5-{7B,14B}-Instruct-1M           | Prompt           | Self-hosted 💻 | Qwen/Qwen2.5-{7B,14B}-Instruct-1M                           |
 | Qwen3-{0.6B,1.7B,4B,8B,14B,32B}        | Function Calling | Qwen           | qwen3-{0.6b,1.7b,4b,8b,14b,32b}-FC                          |
 | Qwen3-{0.6B,1.7B,4B,8B,14B,32B}        | Prompt           | Qwen           | qwen3-{0.6b,1.7b,4b,8b,14b,32b}                             |
 | Qwen3-{0.6B,1.7B,8B,14B,32B}           | Function Calling | Self-hosted 💻 | Qwen/Qwen3-{0.6B,1.7B,8B,14B,32B}-FC                        |
@@ -155,6 +166,10 @@ For model names containing `{...}`, multiple versions are available. For example
 | xLAM-2-3b-fc-r                         | Function Calling | Self-hosted 💻 | Salesforce/xLAM-2-3b-fc-r                                   |
 | xLAM-2-70b-fc-r                        | Function Calling | Self-hosted 💻 | Salesforce/Llama-xLAM-2-70b-fc-r                            |
 | xLAM-2-8b-fc-r                         | Function Calling | Self-hosted 💻 | Salesforce/Llama-xLAM-2-8b-fc-r                             |
+| AFM-4.5B                               | Prompt           | Self-hosted 💻 | arcee-ai/AFM-4.5B                                           |
+| InternLM2.5-7B-Chat-1M                 | Prompt           | Self-hosted 💻 | internlm/internlm2_5-7b-chat-1m                             |
+| SmolLM3-3B                             | Function Calling | Self-hosted 💻 | HuggingFaceTB/SmolLM3-3B-FC                                 |
+| Yi-Coder-9B-Chat                       | Prompt           | Self-hosted 💻 | 01-ai/Yi-Coder-9B-Chat                                      |
 | Yantri-Qwen3-8B                        | Function Calling | Self-hosted 💻 | yantri-tool/Qwen3-8B-FC                                     |
 | Yantri-Qwen3.5-9B                      | Function Calling | Self-hosted 💻 | yantri-tool/Qwen3.5-9B-FC                                   |
 | CodeShield-Qwen3.5-{0.8B,2B,4B,9B}-Instruct | Function Calling | Self-hosted 💻 | CodeShield/Qwen3.5-{0.8B,2B,4B,9B}-Instruct-FC           |
