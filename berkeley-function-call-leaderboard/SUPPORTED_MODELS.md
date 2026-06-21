@@ -120,6 +120,7 @@ For model names containing `{...}`, multiple versions are available. For example
 | OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M1 | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M1-FC      |
 | OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M2 | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M2-FC      |
 | OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-LC | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-LC-FC      |
+| OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M2-R2 | Function Calling | Self-hosted 💻 | CodeShield/OctoLong-Qwen3-{1.7B,4B,8B}-Instruct-M2-R2-FC |
 | OctoLong-{0.6B,1.7B,4B,8B,14B}-Instruct | Function Calling | Self-hosted 💻 | OctoLong/OctoLong-{0.6B,1.7B,4B,8B,14B}-Instruct-FC         |
 | o3-2025-04-16                          | Function Calling | OpenAI         | o3-2025-04-16-FC                                            |
 | o3-2025-04-16                          | Prompt           | OpenAI         | o3-2025-04-16                                               |
