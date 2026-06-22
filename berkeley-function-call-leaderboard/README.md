@@ -191,11 +191,13 @@ uv run bfcl generate --model MODEL_NAME --test-category TEST_CATEGORY --num-thre
 
 #### For Locally-hosted OSS Models
 
-A typical run pins one GPU, picks a free port, sets a context cap that fits the model, and allows overwriting prior results:
+A typical run pins one GPU, picks a free port, sets a context cap that fits the model, and allows overwriting prior results. Set `MODEL_NAME` once and reuse it across the generate / evaluate / score steps:
 
 ```bash
-CUDA_VISIBLE_DEVICES=4 LOCAL_SERVER_PORT=1092 uv run --extra oss_eval_vllm bfcl generate \
-  --model "Qwen/Qwen3-4B-Instruct-2507-FC" \
+export MODEL_NAME="OctoLong/OctoLong-4B-Instruct-FC"
+
+CUDA_VISIBLE_DEVICES=0 LOCAL_SERVER_PORT=1090 uv run --extra oss_eval_vllm bfcl generate \
+  --model "$MODEL_NAME" \
   --test-category "non_live,live,multi_turn" \
   --backend vllm \
   --num-gpus 1 \
@@ -259,27 +261,28 @@ REMOTE_OPENAI_TOKENIZER_PATH=/path/to/local/tokenizer  # Optional: specify local
 
 **Important:** You must have generated the model responses before running the evaluation. Evaluation is pure-Python scoring against the cached generation results — no GPU, no vLLM extra, and no `LOCAL_SERVER_PORT` is needed.
 
-Once you have the results, run:
+Reusing the `MODEL_NAME` from the generate step, the typical evaluation invocation is:
 
 ```bash
 uv run bfcl evaluate \
-  --model "Qwen/Qwen3-4B-Instruct-2507-FC" \
-  --test-category "non_live,live,multi_turn"
+  --model "$MODEL_NAME" \
+  --test-category "non_live,live,multi_turn" \
+  --partial-eval
+```
+
+`--partial-eval` is the recommended default for local OSS runs: it lets the evaluator silently skip benchmark entries that aren't present in the result files (e.g. when a generation run was interrupted, when you used `--run-ids` to target specific cases, or when a few inference calls failed and were skipped). Without it the evaluator errors out on any missing ID. **Note:** scores from a partial run won't match the official leaderboard numbers — only a complete generation pass will.
+
+If your generation run is complete and you want the strict full-set check, drop the flag:
+
+```bash
+uv run bfcl evaluate --model "$MODEL_NAME" --test-category "non_live,live,multi_turn"
 ```
 
 The general form:
 
 ```bash
-uv run bfcl evaluate --model MODEL_NAME --test-category TEST_CATEGORY
+uv run bfcl evaluate --model MODEL_NAME --test-category TEST_CATEGORY [--partial-eval]
 ```
-
-If you **only** generated a subset of benchmark entries (e.g. by using `--run-ids` during the generation step or by manually editing the result files) and you wish to evaluate *just* those entries, add the `--partial-eval` flag:
-
-```bash
-uv run bfcl evaluate --model MODEL_NAME --test-category TEST_CATEGORY --partial-eval
-```
-
-When `--partial-eval` is set, the evaluator silently skips IDs that are not present in the model result file and computes accuracy on the remaining subset. Please note that the score may differ from a full-set evaluation and therefore might not match the official leaderboard numbers.
 
 The `MODEL_NAME` and `TEST_CATEGORY` options are the same as those used in the [Generating LLM Responses](#generating-llm-responses) section. For details, refer to [SUPPORTED_MODELS.md](./SUPPORTED_MODELS.md) and [TEST_CATEGORIES.md](./TEST_CATEGORIES.md).
 
@@ -315,7 +318,7 @@ uv sync --extra wandb
 After `bfcl evaluate` writes the per-category `*_score.json` files, `bfcl score` reads them and prints per-split top-line numbers — one block per split (`non_live`, `live`, `multi_turn`, `agentic`) plus an overall block with macro and micro averages across the splits actually present on disk:
 
 ```bash
-uv run bfcl score --model "Qwen/Qwen3-4B-Instruct-2507-FC"
+uv run bfcl score --model "$MODEL_NAME"
 ```
 
 Scope the report to a single split with `--split`:
