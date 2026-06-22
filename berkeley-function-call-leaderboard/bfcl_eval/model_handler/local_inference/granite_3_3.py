@@ -34,10 +34,12 @@ class Granite33FCHandler(Granite3FCHandler):
                 "You are Granite, developed by IBM."
             )
             if function:
+                # Granite 3.3's Jinja template uses slightly different wording from 3.1/3.2:
+                # drops "AI" from "AI assistant" and adds "only" before "with <|tool_call|>".
                 system_prompt += (
-                    " You are a helpful AI assistant with access "
+                    " You are a helpful assistant with access "
                     "to the following tools. When a tool is required to answer the user's query, respond "
-                    "with <|tool_call|> followed by a JSON list of tools used. If a tool does not exist "
+                    "only with <|tool_call|> followed by a JSON list of tools used. If a tool does not exist "
                     "in the provided list of tools, notify the user that you do not have the ability to fulfill the request."
                 )
 
@@ -60,5 +62,8 @@ class Granite33FCHandler(Granite3FCHandler):
                 + msg["content"]
                 + "<|end_of_text|>\n"
             )
+
+        # Generation cue — see Granite3FCHandler._format_prompt for the rationale.
+        formatted_prompt += "<|start_of_role|>assistant<|end_of_role|>"
 
         return formatted_prompt

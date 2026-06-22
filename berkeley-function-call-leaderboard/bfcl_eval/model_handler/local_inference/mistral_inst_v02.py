@@ -9,14 +9,17 @@ class MistralInstV02Handler(OSSHandler):
 
     The v0.2 chat template only supports user/assistant alternation with an
     optional initial system message — there are no tool branches. The system
-    message, if present, is folded into the first user turn:
+    message, if present, is folded into the FIRST user turn (verified against
+    `tokenizer.apply_chat_template`):
 
-        <s>[INST] {system}\n\n{user1} [/INST] {assistant1}</s>[INST] {user2} [/INST] ...
+        <s> [INST] {system}\\n\\n{user1} [/INST] {assistant1}</s> [INST] {user2} [/INST] ...
+
+    Note the leading space before every `[INST]` and after every `[/INST]`.
 
     The base v0.2 tokenizer rejects any role other than user/assistant/system,
     so this is prompt-mode only. The BFCL prompt-mode pipeline injects function
-    docs into the system message, which we then fold into the first user turn
-    per the template.
+    docs into the system message, which we fold into the first user turn per
+    the template.
     """
 
     def __init__(
@@ -42,19 +45,18 @@ class MistralInstV02Handler(OSSHandler):
             system_message = None
             loop_messages = messages
 
-        user_messages = [m for m in loop_messages if m["role"] == "user"]
-        last_user = user_messages[-1] if user_messages else None
-
         formatted_prompt = bos_token
+        first_user_seen = False
         for message in loop_messages:
             role = message["role"]
             content = message["content"]
 
             if role == "user":
-                if message is last_user and system_message is not None:
-                    formatted_prompt += f"[INST] {system_message}\n\n{content} [/INST]"
+                if not first_user_seen and system_message is not None:
+                    formatted_prompt += f" [INST] {system_message}\n\n{content} [/INST]"
                 else:
-                    formatted_prompt += f"[INST] {content} [/INST]"
+                    formatted_prompt += f" [INST] {content} [/INST]"
+                first_user_seen = True
             elif role == "assistant":
                 formatted_prompt += f" {content}{eos_token}"
 

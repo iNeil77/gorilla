@@ -289,4 +289,9 @@ class Granite3FCHandler(OSSHandler):
                 + "<|end_of_text|>\n"
             )
 
+        # Generation cue — the HF chat_template appends this when add_generation_prompt=True.
+        # Without it the model is forced to emit the prefix itself before generating, which
+        # corrupts the output distribution.
+        formatted_prompt += "<|start_of_role|>assistant<|end_of_role|>"
+
         return formatted_prompt
