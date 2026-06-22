@@ -254,17 +254,34 @@ class MistralFCHandler(OSSHandler):
 
     @override
     def _parse_query_response_prompting(self, api_response: Any) -> dict:
-        model_responses = api_response.choices[0].text
+        raw_text = api_response.choices[0].text
         tool_call_ids = []
         """
         Mistral models require a tool_call_id, which should be 9 randomly-generated alphanumeric characters, and assigned to the id key of the tool call dictionary.
         Source: https://huggingface.co/docs/transformers/main/chat_templating#advanced-tool-use--function-calling
-        
+
         "[{\"name\": \"math.factorial\", \"arguments\": {\"number\": 5}}, {\"name\": \"math.factorial\", \"arguments\": {\"number\": 10}}, {\"name\": \"math.factorial\", \"arguments\": {\"number\": 15}}]"
         """
         try:
-            model_responses = json.loads(model_responses)
-            for model_response in model_responses:
+            parsed = json.loads(raw_text)
+        except json.JSONDecodeError:
+            parsed = None
+
+        # Only treat the response as a tool-call list when the parse yields a
+        # list of dicts that each carry the expected name/arguments fields.
+        # Otherwise fall back to raw text (e.g. plain refusals, JSON-quoted
+        # strings, or list-of-strings outputs from weaker models).
+        is_tool_call_list = (
+            isinstance(parsed, list)
+            and len(parsed) > 0
+            and all(
+                isinstance(item, dict) and "name" in item and "arguments" in item
+                for item in parsed
+            )
+        )
+
+        if is_tool_call_list:
+            for model_response in parsed:
                 tool_call_id = self.generate_random_string()
                 model_response["id"] = tool_call_id
                 tool_call_ids.append(tool_call_id)
@@ -272,14 +289,12 @@ class MistralFCHandler(OSSHandler):
             # We prepare the model responses here because it's easier to do it here than in the `_format_prompt` method
             # The `[TOOL_CALLS]` tag is added here, as required by the chat template
             model_responses_message_for_chat_history = (
-                f"[TOOL_CALLS]{json.dumps(model_responses)}"
+                f"[TOOL_CALLS]{json.dumps(parsed)}"
             )
-
-            model_responses = [
-                {item["name"]: item["arguments"]} for item in model_responses
-            ]
-        except json.JSONDecodeError:
-            model_responses_message_for_chat_history = model_responses
+            model_responses = [{item["name"]: item["arguments"]} for item in parsed]
+        else:
+            model_responses = raw_text
+            model_responses_message_for_chat_history = raw_text
 
         return {
             "model_responses": model_responses,
