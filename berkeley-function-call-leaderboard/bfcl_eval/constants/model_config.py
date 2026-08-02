@@ -66,6 +66,7 @@ from bfcl_eval.model_handler.local_inference.octolong_fc import OctoLongFCHandle
 from bfcl_eval.model_handler.local_inference.octolong_instruct_fc import OctoLongInstructFCHandler
 from bfcl_eval.model_handler.local_inference.qwen import QwenHandler
 from bfcl_eval.model_handler.local_inference.qwen_fc import QwenFCHandler
+from bfcl_eval.model_handler.local_inference.qwen_fc_nothink import QwenFCNoThinkHandler
 from bfcl_eval.model_handler.local_inference.nanbeige_fc import NanbeigeFCHandler
 from bfcl_eval.model_handler.local_inference.salesforce_llama import (
     SalesforceLlamaHandler,
@@ -1936,6 +1937,18 @@ local_inference_model_map = {
         org="Qwen",
         license="apache-2.0",
         model_handler=QwenFCHandler,
+        input_price=None,
+        output_price=None,
+        is_fc_model=True,
+        underscore_to_dot=False,
+    ),
+    "Qwen/Qwen3-8B-FC-NoThink": ModelConfig(
+        model_name="Qwen/Qwen3-8B",
+        display_name="Qwen3-8B (FC, NoThink)",
+        url="https://huggingface.co/Qwen/Qwen3-8B",
+        org="Qwen",
+        license="apache-2.0",
+        model_handler=QwenFCNoThinkHandler,
         input_price=None,
         output_price=None,
         is_fc_model=True,
